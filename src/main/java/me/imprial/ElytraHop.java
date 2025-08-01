@@ -7,6 +7,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerStartSneakingEvent;
+import net.minestom.server.event.player.PlayerStopFlyingWithElytraEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
@@ -34,8 +35,11 @@ public class ElytraHop {
         globalEventHandler.addListener(PlayerStartSneakingEvent.class, e -> {
             e.getPlayer().setVelocity(e.getPlayer().getPosition().direction().normalize().mul(20));
         });
+        globalEventHandler.addListener(PlayerStopFlyingWithElytraEvent.class, e -> {
+            e.getPlayer().setFlyingWithElytra(true);
+        });
 
-        // Start the server on port 25565
-        minecraftServer.start("0.0.0.0", 25565);
+        // Start the server on port 25566 (so i can use viaproxy hehe)
+        minecraftServer.start("0.0.0.0", 25566);
     }
 }

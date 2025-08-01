@@ -2,6 +2,7 @@ package me.imprial;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
@@ -17,6 +18,7 @@ public class PlatformManager {
     private final Player player;
     private InstanceContainer instance;
     private final Queue<Platform> platQueue = new LinkedList<>();
+    private Platform lastPlat;
 
     public PlatformManager(Player player) {
         this.player = player;
@@ -29,6 +31,8 @@ public class PlatformManager {
         instance.setGenerator(unit -> unit.modifier().fillHeight(0, 1, Block.WHITE_STAINED_GLASS));
 
         spawnPlatform(ElytraHop.spawn);
+        spawnNext();
+        spawnNext();
     }
 
     public InstanceContainer instance() {
@@ -36,13 +40,23 @@ public class PlatformManager {
     }
 
     private void spawnPlatform(Point pos) {
-        platQueue.add(new Platform(this, pos));
+        lastPlat = new Platform(this, pos);
+        platQueue.add(lastPlat);
     }
 
     private void spawnNext() {
-        var pPos = player.getPosition().withY(player.getPosition().blockY());
-        var power = 6;
-        var newLoc = pPos.add(pPos.direction().normalize().mul(power).withY(0));
+        spawnNext(0);
+    }
+    private void spawnNext(double heightDiff) {
+        var power = (player.getPosition().sub(player.getPreviousPosition()).asVec().length()*10) + 5;
+        var oldLoc = lastPlat.getPos();
+        var newDiff = 0;
+        if (heightDiff >=0) {
+            newDiff = (int) (new Random().nextDouble(-4, heightDiff-1));
+        } else {
+            newDiff = (int) (heightDiff*1.5);
+        }
+        var newLoc = oldLoc.add(power, 0, power).withY(lastPlat.getPos().blockY()+newDiff);
         spawnPlatform(newLoc);
     }
 
@@ -51,6 +65,7 @@ public class PlatformManager {
             var oldPlat = platQueue.poll();
             if (oldPlat!=null) oldPlat.remove();
         }
-        spawnNext();
+        var diff = player.getPosition().blockY() - platform.getPos().blockY();
+        spawnNext(diff);
     }
 }

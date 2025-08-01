@@ -30,6 +30,10 @@ public class Platform {
         initListener();
     }
 
+    public Point getPos() {
+        return pos;
+    }
+
     private void initListener() {
         eventListener = EventListener.builder(PlayerMoveEvent.class)
         .handler(e -> {
@@ -70,6 +74,7 @@ public class Platform {
                 meta.setPosRotInterpolationDuration(5);
                 meta.setBrightnessOverride(20);;
                 meta.setGlowColorOverride(0);
+                meta.setHasGlowingEffect(true);
                 meta.setBlockState(block);
                 entity.setInstance(platformManager.instance(), loc.sub(0, 6, 0));
                 MinecraftServer.getSchedulerManager().scheduleNextTick(() -> entity.teleport(loc));
