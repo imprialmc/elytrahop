@@ -1,6 +1,8 @@
 package me.imprial;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -48,24 +50,24 @@ public class PlatformManager {
         spawnNext(0);
     }
     private void spawnNext(double heightDiff) {
-        var power = (player.getPosition().sub(player.getPreviousPosition()).asVec().length()*10) + 5;
+        var power = (int) ((player.getPosition().sub(player.getPreviousPosition()).asVec().length()*10) + 5);
         var oldLoc = lastPlat.getPos();
         var newDiff = 0;
-        if (heightDiff >=0) {
-            newDiff = (int) (new Random().nextDouble(-4, heightDiff-1));
-        } else {
+        var r = new Random();
+        if (heightDiff > 0) {
+            newDiff = (int) (r.nextDouble(0, heightDiff));
+        } else if (heightDiff < 0) {
             newDiff = (int) (heightDiff*1.5);
         }
-        var newLoc = oldLoc.add(power, 0, power).withY(lastPlat.getPos().blockY()+newDiff);
+        var newLoc = oldLoc.add(r.nextInt(power-5, power+5), 0, r.nextInt(power-5, power+5)).withY(lastPlat.getPos().blockY()+newDiff);
         spawnPlatform(newLoc);
     }
 
     public void enteredPlat(Platform platform) {
-        if (platQueue.size() > 3) {
-            var oldPlat = platQueue.poll();
-            if (oldPlat!=null) oldPlat.remove();
+        while (!platform.equals(platQueue.peek())) {
+            platQueue.poll().remove();
+            var diff = player.getPosition().blockY() - platform.getPos().blockY();
+            spawnNext(diff);
         }
-        var diff = player.getPosition().blockY() - platform.getPos().blockY();
-        spawnNext(diff);
     }
 }

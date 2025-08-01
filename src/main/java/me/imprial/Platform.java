@@ -2,7 +2,9 @@ package me.imprial;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
@@ -71,12 +73,12 @@ public class Platform {
                 var entity = new Entity(EntityType.BLOCK_DISPLAY);
                 var meta = (BlockDisplayMeta) entity.getEntityMeta();
                 entity.setNoGravity(true);
-                meta.setPosRotInterpolationDuration(5);
+                meta.setPosRotInterpolationDuration(10);
                 meta.setBrightnessOverride(20);;
-                meta.setGlowColorOverride(0);
+                meta.setGlowColorOverride(NamedTextColor.GREEN.value());
                 meta.setHasGlowingEffect(true);
                 meta.setBlockState(block);
-                entity.setInstance(platformManager.instance(), loc.sub(0, 6, 0));
+                entity.setInstance(platformManager.instance(), loc.sub(0, 50, 0));
                 MinecraftServer.getSchedulerManager().scheduleNextTick(() -> entity.teleport(loc));
                 entities.add(entity);
             }
@@ -86,5 +88,6 @@ public class Platform {
     public void remove() {
         blocks.forEach(block -> platformManager.instance().setBlock(block,Block.AIR));
         entities.forEach(entity -> entity.remove());
+        platformManager.instance().eventNode().removeListener(eventListener);
     }
 }
